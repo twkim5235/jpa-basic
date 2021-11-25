@@ -218,10 +218,10 @@ JPA를 사용하면 엔티티 객체를 중심으로 개발
 
     - JPA는 커밋하는 시점에  flush가 호출되면서 entity와 snapshot을 비교한다.
 
-    - | @ID     | Entity       | 스냅샷         |
-            | ------- | ------------ | -------------- |
-      | memberA | memberA 객체 | memberA 스냅샷 |
-      | memberB | memberB 객체 | memberB 스냅샷 |
+     | @ID     | Entity       | 스냅샷         |
+     | ------- | ------------ | -------------- |
+     | memberA | memberA 객체 | memberA 스냅샷 |
+     | memberB | memberB 객체 | memberB 스냅샷 |
 
       비교를 한뒤, Update SQL를 쓰기지연 SQL 저장소에 저장한다.
 
