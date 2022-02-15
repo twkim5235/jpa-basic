@@ -1088,6 +1088,8 @@ private List<Child> childList = new ArrayList<>();
 - @OneToOne, @OneToMany만 가능
 - 참고: 개념적으로 부모를 제거하면 자식은 고아가 된다. 따라서 고아 객체 제거 기능을 활성화 하면, 부모를 제거할 때 자식도 함께 제거가 된다. 이것은 CascadeType.REMOVE처럼 동작한다.
 
+
+
 ### 영속성 전이 + 고아 객체, 생명 주기
 
 - **cascade = CascadeType.ALL + orphanRemoval = true**
