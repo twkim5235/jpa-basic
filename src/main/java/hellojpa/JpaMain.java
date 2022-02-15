@@ -19,33 +19,20 @@ public class JpaMain {
         tx.begin(); //트랜잭션 시작
 
         try {
+            Child child1 = new Child();
+            Child child2 = new Child();
 
-            Team team = new Team();
-            team.setName("teamA");
-            em.persist(team);
+            Parent parent = new Parent();
+            parent.addChild(child1);
+            parent.addChild(child2);
 
-            Team teamB = new Team();
-            team.setName("teamB");
-            em.persist(teamB);
-
-            Member member1 = new Member();
-            member1.setUsername("member1");
-            member1.setTeam(team);
-            em.persist(member1);
-
-            Member member2 = new Member();
-            member2.setUsername("member2");
-            member2.setTeam(teamB);
-            em.persist(member2);
+            em.persist(parent);
 
             em.flush();
             em.clear();
 
-//            Member m = em.find(Member.class, member1.getId());
-
-            List<Member> members = em.createQuery("select m from Member m join fetch m.team", Member.class).getResultList();
-            //SQL: select * from Member
-            //SQL: select * from Team where Team.ID = Member.Team_ID
+            Parent findParent = em.find(Parent.class, parent.getId());
+            em.remove(findParent);
 
             tx.commit(); //트랜잭션 커밋
         } catch (Exception e) {
