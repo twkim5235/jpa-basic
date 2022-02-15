@@ -949,3 +949,83 @@ member.getName();
 - 참고: JPA 표준은 강제 초기화 없음
 
   강제 호출: member.getName()
+
+### 즉시로딩 지연로딩
+
+**지연 로딩 LAZY를 사용해서 프록시로 조회**
+
+~~~java
+public class Member extends BaseEntity{
+    @Id //pk 매핑
+    @GeneratedValue
+    @Column(name = "MEMBER_ID")
+    private Long id;
+
+    @Column(name = "USERNAME")
+    private String username;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "TEAM_ID")
+  	
+  	...
+}
+
+System.out.println("=========================");
+m.getTeam() 					 //team을 불러올 때는 초기화가 안 됨
+m.getTeam().getName(); //실제 team을 사용하는 시점에 초기화
+System.out.println("=========================");
+~~~
+
+
+
+**즉시 로딩 EAGER를 사용해서 함께 조회**
+
+~~~java
+public class Member extends BaseEntity{
+    @Id //pk 매핑
+    @GeneratedValue
+    @Column(name = "MEMBER_ID")
+    private Long id;
+
+    @Column(name = "USERNAME")
+    private String username;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "TEAM_ID")
+  	
+  	...
+}
+~~~
+
+
+
+#### 프록시와 즉시로딩 주의
+
+- **가급적 지연 로딩만 사용(특히 실무에서)**
+
+- 즉시 로딩을 적용하면 예상하지 못한 SQL이 발생
+
+- **즉시 로딩은 JPQL에서 N+1 문제를 일으킨다.**
+
+  ~~~java
+  List<Member> members = em.createQuery("select m from Member m", Member.class).getResultList();
+  //SQL: select * from Member
+  //SQL: select * from Team where Team.ID = Member.Team_ID
+  ~~~
+
+  
+
+- **@ManyToOne, @OneToOne은 기본이 즉시로딩**
+
+  **-> LAZY로 설정**
+
+- @OneToMany, @ManyToMany는 기본이 지연 로딩
+
+
+
+#### 지연로딩 활용 - 실무
+
+- **모든 연관관계에 지연 로딩 사용!**
+- **실무에서 즉시 로딩 사용 금지!**
+- **JPQL fetch Join이나, 엔티티 그래프 기능 사용!**
+- **즉시 로딩은 예상하지 못한 쿼리가 나간다.**

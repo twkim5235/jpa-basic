@@ -20,23 +20,32 @@ public class JpaMain {
 
         try {
 
+            Team team = new Team();
+            team.setName("teamA");
+            em.persist(team);
+
+            Team teamB = new Team();
+            team.setName("teamB");
+            em.persist(teamB);
+
             Member member1 = new Member();
             member1.setUsername("member1");
+            member1.setTeam(team);
+            em.persist(member1);
 
             Member member2 = new Member();
             member2.setUsername("member2");
-
-            em.persist(member1);
+            member2.setTeam(teamB);
             em.persist(member2);
 
             em.flush();
             em.clear();
 
-            Member refMember = em.getReference(Member.class, member1.getId());
-            System.out.println("refMember = " + refMember.getClass()); // Proxy
-            refMember.getUsername(); //강제 초기화
+//            Member m = em.find(Member.class, member1.getId());
 
-            Hibernate.initialize(refMember);
+            List<Member> members = em.createQuery("select m from Member m join fetch m.team", Member.class).getResultList();
+            //SQL: select * from Member
+            //SQL: select * from Team where Team.ID = Member.Team_ID
 
             tx.commit(); //트랜잭션 커밋
         } catch (Exception e) {
