@@ -2,6 +2,12 @@ package hellojpa;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static javax.persistence.CascadeType.*;
 
 @Entity
 @SequenceGenerator(
@@ -9,7 +15,7 @@ import java.time.LocalDateTime;
         sequenceName = "MEMBER_SEQ",//매필할 데이터베이스 시퀀스 이름
         initialValue = 1, allocationSize = 50
 )
-public class Member extends BaseEntity{
+public class Member {
     @Id //pk 매핑
     @GeneratedValue
     @Column(name = "MEMBER_ID")
@@ -18,26 +24,26 @@ public class Member extends BaseEntity{
     @Column(name = "USERNAME")
     private String username;
 
-    //기간
-    @Embedded
-    private Period workPeriod;
-
     //주소
     @Embedded
     private Address homeAddress;
 
-    //주소
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "city",
-                    column = @Column(name = "WORK_CITY")),
-            @AttributeOverride(name = "street",
-                    column = @Column(name = "WORK_STREET")),
-            @AttributeOverride(name = "zipcode",
-                    column = @Column(name = "WORK_ZIPCODE"))
+    @ElementCollection
+    @CollectionTable(name = "FAVORITE_FOODS", joinColumns =
+        @JoinColumn(name = "MEMBER_ID")
+    )
+    @Column(name = "FOOD_NAME")
+    private Set<String> favoriteFoods = new HashSet<>();
 
-    })
-    private Address workAddress;
+//    @ElementCollection
+//    @CollectionTable(name = "ADDRESS", joinColumns =
+//        @JoinColumn(name = "MEMBER_ID")
+//    )
+//    private List<Address> addressHistory = new ArrayList<>();
+
+    @OneToMany(cascade = ALL, orphanRemoval = true)
+    @JoinColumn(name = "MEMBER_ID")
+    private List<AddressEntity> addressHistory = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -55,19 +61,27 @@ public class Member extends BaseEntity{
         this.username = username;
     }
 
-    public Period getWorkPeriod() {
-        return workPeriod;
-    }
-
-    public void setWorkPeriod(Period workPeriod) {
-        this.workPeriod = workPeriod;
-    }
-
     public Address getHomeAddress() {
         return homeAddress;
     }
 
     public void setHomeAddress(Address homeAddress) {
         this.homeAddress = homeAddress;
+    }
+
+    public Set<String> getFavoriteFoods() {
+        return favoriteFoods;
+    }
+
+    public void setFavoriteFoods(Set<String> favoriteFoods) {
+        this.favoriteFoods = favoriteFoods;
+    }
+
+    public List<AddressEntity> getAddressHistory() {
+        return addressHistory;
+    }
+
+    public void setAddressHistory(List<AddressEntity> addressHistory) {
+        this.addressHistory = addressHistory;
     }
 }
