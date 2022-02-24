@@ -1492,3 +1492,20 @@ Member result = em.createQuery("select m from Member m where m.username = :usern
    - 패키지명을 포함한 전체 클래스명 입력
    - 순서와 타입이 일치하는 생성자 필요
 
+
+
+### 페이징 API
+
+- JPA는 페이징을 다음 두 API로 추상화
+- setFirstResult(int startPosition): 조회 시작 위치(0 부터 시작)
+- setMaxREsults(int maxREsult): 조회할 데이터 수
+
+ex)
+
+~~~java
+List<Member> result = em.createQuery("select m from Member m order by m.age desc", Member.class)
+                    .setFirstResult(1)
+                    .setMaxResults(10)
+                    .getResultList();
+~~~
+
