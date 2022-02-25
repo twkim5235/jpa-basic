@@ -1683,3 +1683,25 @@ from Team t
 사용자 이름이 '관리자'면 null을 반환하고 나머지는 본인의 이름을 반환
 
 `select NULLIF(m.username, '관리자') from Member m`
+
+
+
+### JPQL 기본 함수
+
+- CONCAT
+- SUBSTRING
+- TRIM
+- LOWER, UPPER
+- LENGTH
+- LOCATE
+- ABS, SQRT, MOD
+- SIZE, INDEX(JPA 용도)
+
+
+
+#### 사용자 정의 함수 호출
+
+- 하이버네이트는 사용전 방언에 추가해야한다.
+  - 사용하는 DB 방언을 상속받고, 사용자 정의 함수를 등록한다.
+
+`select funtion('group_concat', i.name) from Item i`
