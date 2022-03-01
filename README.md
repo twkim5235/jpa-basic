@@ -1779,3 +1779,118 @@ where t.name = '팀A'
 - 조인은 SQL 튜닝에 중요 포인트
 - 묵시적 조인은 조인이 일어나는 상황을 한눈에 파악하기 어려움
 
+
+
+### 페치 조인 Fetch Join
+
+- SQL 조인 종류 X
+- JPQL에서 **성능 최적화를 위해 제공하는 기능**
+- 연관된 엔티티나 컬렉션을 **SQL 한 번에 함께 조회**하는 기능
+- join fetch 명령어 사용
+- 페치 조인 ::= [LEFT [OUTER] | INNER] JOIN FETCH 조인 경로
+
+
+
+#### 엔티티 페치 조인
+
+-  회원을 조회하면서 연관된 팀도 함께 조회(SQL 한번에)
+
+- SQL을 보면 회원 뿐만 아니라 **팀(T.*)**도 함께 **SELECT**
+
+- **[JPQL]**
+
+  select m from Member m join fetch m.team
+
+- **[SQL]**
+
+  select M.*, T.\* FROM MEMBER M **INNER JOIN TEAM T** ON M.TEAM_ID = T.ID
+
+
+
+#### 페치 조인 사용 코드
+
+~~~java
+String query = "select m from Member m join fetch m.team";
+
+            List<Member> result = em.createQuery(query, Member.class)
+                    .getResultList();
+
+            for (Member s : result) {
+                System.out.println("s = " + s.getUsername() + ": " + s.getTeam().getName());
+            }
+~~~
+
+**Log**
+
+~~~
+Hibernate: 
+    /* select
+        m 
+    from
+        Member m 
+    join
+        fetch m.team */ select
+            member0_.id as id1_0_0_,
+            team1_.id as id1_3_1_,
+            member0_.age as age2_0_0_,
+            member0_.TEAM_ID as team_id5_0_0_,
+            member0_.type as type3_0_0_,
+            member0_.username as username4_0_0_,
+            team1_.name as name2_3_1_ 
+        from
+            Member member0_ 
+        inner join
+            Team team1_ 
+                on member0_.TEAM_ID=team1_.id
+s = 관리자1: 팀A
+s = 관리자2: 팀A
+s = 관리자3: 팀B
+~~~
+
+
+
+#### 컬렉션 페치 조인
+
+- 일대다 관계, 컬렉션 페치 조인
+
+- **[JPQL]**
+
+  select t
+
+  from Team t join fetch t.members
+
+  where t.name = '팀A'
+
+- **[SQL]**
+
+  SELECT T.*, M.*
+
+  FROM TEAM T
+
+  INNER JOIN MEMBER M ON T.ID = M.TEAM_ID
+
+  WHERE T.NAME = '팀A'
+
+
+
+#### 페치 조인과 DISTINCT
+
+- SQL의 DISTINCT는 중복된 결과를 제거하는 명령
+- JPQL의 DISTINCT 2가지 기능 제공
+  1. SQL에 DISTINCT를 추가
+  2. 애플리케이션에서 엔티티 중복 제거
+- DISTINCT가 추가로 애플리케이션에서 중복 제거시도
+- 같은 식별자를 가진 **Team 엔티티 제거**
+
+
+
+#### 페치 조인과 일반 조인의 차이
+
+- 일반 조인 실행 시 연관된 엔티티를 함께 조회하지 않음
+
+- JPQL은 결과를 반환할 때 연관관계 고려 X
+- 단지 SELECT 절에 지정한 엔티티만 조회할 뿐
+- 여기서는 팀 엔티티만 조회하고, 회원 엔티티는 조회 X
+- 페치 조인을 사용할 때만 연관된 엔티티도 함께 **조회(즉시 로딩)**
+- **페치 조인은 객체 그래프를 SQL 한번에 조회하는 개념**
+
