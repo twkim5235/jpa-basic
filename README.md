@@ -1942,3 +1942,66 @@ s = 관리자3: 팀B
 - **[SQL]**(JPQL 둘다 같은 SQL 실행)
 
   select **count(m.id)** as int from Member m
+
+
+
+**엔티티 직접 사용 - 외래키 값**
+
+- JPQL에서 엔티티를 직접 사용하면 SQL에서 해당 엔티티의 외래 키 값을 사용
+
+- **[JPQL]**
+
+  select m from Member m **where m.team.id = :teamId**
+
+  select m from Member m **where m.team = :team**
+
+- **[SQL]**(JPQL 둘다 같은 SQL 실행)
+
+  select m from Member where m.team_id = teamId
+
+
+
+### JPQL - Named 쿼리
+
+#### Named 쿼리 - 정적 쿼리
+
+- 미리 정의해서 이름을 부여해두고 사용하는 JPQL
+- 정적 쿼리
+- 어노테이션, XML에 정의
+- 애플리케이션 로딩 시점에 초기화 후 재사용
+- **애플리케이션 로딩 시점에 쿼리를 검증**
+
+
+
+#### Named 쿼리 - 어노테이션
+
+~~~java
+@Entity
+@NamedQuery(
+	name = "Member.findByUsername",
+	query = "select m from Member m where m.username = :username"
+)
+public class Member {
+	...
+}
+
+List<Member> resultList = 
+	em.createNamedQuery("Member.findByUsername", Member.class)
+		.setParameter("username", "회원1")
+		.getResultList();
+~~~
+
+
+
+**Spring Data JPA에서는 @Query를 이용해 NamedQuery를 쓸 수 있다.**
+
+ex)
+
+~~~
+public interface MemberRepository extends JpaRepository<Member, Long>{
+	
+	@Query("select m from Member m where m.username = :username")
+	List<Member> findByUsername(String username);
+}
+~~~
+
